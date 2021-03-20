@@ -5,7 +5,7 @@
 ]]
 
 local getupvalue = (getupvalue or debug.getupvalue);
-local getmetatable = debug.getmetatable;
+local getmetatable = (debug.getmetatable or getrawmetatable);
 
 repeat wait() until game:IsLoaded();
 
