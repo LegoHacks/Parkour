@@ -67,6 +67,13 @@ do
         getfenv().script = mainScript;
         mainEnv = getsenv(mainScript);
         encrypt = mainEnv.encrypt;
+
+        if (library.flags.god_mode) then
+            local antiFallField = Instance.new("ForceField");
+            antiFallField.Visible = false;
+            antiFallField.Name = "joe";
+            antiFallField.Parent = client.Character;
+        end;
     end;
 
     if (client.Character) then
@@ -123,14 +130,11 @@ parkour:AddToggle({
     flag = "god_mode";
     callback = function(enabled)
         if (enabled) then
-            while library.flags.god_mode do
-                if (client.Character and not client.Character:FindFirstChild("joe")) then --> I know who joe is.
-                    local antiFallField = Instance.new("ForceField");
-                    antiFallField.Visible = false;
-                    antiFallField.Name = "joe";
-                    antiFallField.Parent = client.Character;
-                end;
-                wait();
+            if (client.Character and not client.Character:FindFirstChild("joe")) then --> I know who joe is.
+                local antiFallField = Instance.new("ForceField");
+                antiFallField.Visible = false;
+                antiFallField.Name = "joe";
+                antiFallField.Parent = client.Character;
             end;
         elseif (client.Character and client.Character:FindFirstChild("joe")) then
             client.Character.joe:Destroy();
