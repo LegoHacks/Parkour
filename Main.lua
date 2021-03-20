@@ -31,6 +31,7 @@ do
     };
     
     local mt = getmetatable(game);
+    local idx = mt.__index;
     local namecall = mt.__namecall;
     
     setreadonly(mt, false);
@@ -46,6 +47,14 @@ do
         end;
     
         return namecall(self, unpack(args));
+    end);
+
+    mt.__index = newcclosure(function(self, v)
+        if (tostring(v) == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
+            return 0;
+        end;
+
+        return idx(self, v);
     end);
     
     setreadonly(mt, true);
@@ -162,6 +171,11 @@ parkour:AddToggle({
         end;
     end;
 });
+
+parkour:AddToggle({
+    text = "Audio Bypass";
+    flag = "audio_bypass";
+})
 
 parkour:AddToggle({
     text = "No Cola Cooldown";
