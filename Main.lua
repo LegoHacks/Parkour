@@ -83,6 +83,8 @@ parkour:AddToggle({
         if (not enabled) then return end;
         while library.flags.auto_farm do
             if (client.Backpack and client.Backpack:FindFirstChild("Main") and client.PlayerScripts:FindFirstChild("Points") and getsenv(client.Backpack.Main)) then
+                math.randomseed(tick());
+                getrenv().shared.triggerPointsFunction("statAdd", encrypt("DistanceTravelled"), encrypt("1"));
                 local pointsEnv = getsenv(client.PlayerScripts.Points);
                 pointsEnv.changeParkourRemoteParent(workspace);
 
