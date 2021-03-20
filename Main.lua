@@ -36,13 +36,16 @@ do
     setreadonly(mt, false);
     
     mt.__namecall = newcclosure(function(self, ...)
+        local args = {...};
         local method = getnamecallmethod();
     
-        if (method == "FireServer" and banRemotes[tostring(self)]) then
+        if (method == "FireServer" and banRemotes[self.Name]) then
             return;
+        elseif (method == "FireServer" and self.Name == "SubmitCombo" and args[1] > 299) then
+            args[1] = math.random(250, 299); --> Hudzell, please suck my cock :)
         end;
     
-        return namecall(self, ...);
+        return namecall(self, unpack(args));
     end);
     
     setreadonly(mt, true);
@@ -83,8 +86,6 @@ parkour:AddToggle({
         if (not enabled) then return end;
         while library.flags.auto_farm do
             if (client.Backpack and client.Backpack:FindFirstChild("Main") and client.PlayerScripts:FindFirstChild("Points") and getsenv(client.Backpack.Main)) then
-                math.randomseed(tick());
-                getrenv().shared.triggerPointsFunction("statAdd", encrypt("DistanceTravelled"), encrypt("1"));
                 local pointsEnv = getsenv(client.PlayerScripts.Points);
                 pointsEnv.changeParkourRemoteParent(workspace);
 
@@ -132,11 +133,16 @@ parkour:AddToggle({
     text = "Maxed Combo";
     flag = "maxed_combo";
     callback = function(enabled)
-        if (not enabled) then return end;
+        if (not enabled) then
+            return mainEnv.breakCombo();
+        end;
+
+        replicatedStorage.UpdateCombo:FireServer(5);
 
         while library.flags.maxed_combo do
-            variables.comboTime = 100;
-            variables.comboHealth = 100;
+            variables.comboTime = math.huge
+            variables.comboHealth = math.huge;
+            variables.comboXp = math.huge;
             variables.comboLevel = 5;
             wait();
         end;
