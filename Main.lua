@@ -50,7 +50,7 @@ do
     end);
 
     mt.__index = newcclosure(function(self, v)
-        if (tostring(v) == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
+        if (v == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
             return 0;
         end;
 
