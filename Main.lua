@@ -259,6 +259,18 @@ parkour:AddButton({
             firetouchinterest(client.Character.HumanoidRootPart, part, 0);
         end;
     end;
-})
+});
+
+parkour:AddButton({
+    text = "Discover all Spawns";
+    callback = function()
+        for i, v in next, workspace:GetChildren() do
+            if (not v:IsA("SpawnLocation") or v.Name == "SpawnLocation" or not client.Character) then continue end;
+            
+            client.Character.HumanoidRootPart.CFrame = v.CFrame + Vector3.new(0, 3, 0);
+            wait(0.5);
+        end;
+    end;
+});
 
 library:Init();
