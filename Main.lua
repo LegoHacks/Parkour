@@ -248,4 +248,17 @@ parkour:AddToggle({
     end;
 });
 
+parkour:AddButton({
+    text = "Unlock All Badges";
+    callback = function()
+        for i, v in next, workspace:GetChildren() do
+            if (v.Name ~= "BadgeAwarder" or not client.Character) then continue end;
+        
+            local part = v:FindFirstChildWhichIsA("Part");
+            firetouchinterest(client.Character.HumanoidRootPart, part, 1);
+            firetouchinterest(client.Character.HumanoidRootPart, part, 0);
+        end;
+    end;
+})
+
 library:Init();
