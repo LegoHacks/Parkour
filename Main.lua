@@ -17,52 +17,47 @@ local variables, mainEnv, encrypt;
 
 do
     local banRemotes = {
-        ["AttemptTeleport"] = true;
-        ["FireToDieInstantly"] = true;
-        ["LandWithForceField"] = true;
-        ["LoadString"] = true;
-        ["FlyRequest"] = true;
-        ["FinishTimeTrial"] = true;
-        ["Under3Seconds"] = true;
-        ["UpdateDunceList"] = true;
-        ["HighCombo"] = true;
-        ["r"] = true;
-        ["t"] = true;
+        "AttemptTeleport";
+        "FireToDieInstantly";
+        "LandWithForceField";
+        "LoadString";
+        "FlyRequest";
+        "FinishTimeTrial";
+        "Under3Seconds";
+        "UpdateDunceList";
+        "HighCombo";
+        "r";
+        "t";
     };
-    
-    local mt = getmetatable(game);
-    local idx = mt.__index;
-    local namecall = mt.__namecall;
-    
-    setreadonly(mt, false);
-    
-    mt.__namecall = newcclosure(function(self, ...)
+
+    local nc;
+    nc = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
         local args = {...};
         local method = getnamecallmethod();
     
-        if (method == "FireServer" and banRemotes[self.Name]) then
+        if (method == "FireServer" and table.find(banRemotes, self.Name)) then
             return;
         elseif (method == "FireServer" and self.Name == "SubmitCombo" and args[1] > 299) then
             args[1] = math.random(250, 299); --> Hudzell, please suck my cock :)
         end;
     
-        return namecall(self, unpack(args));
-    end);
+        return nc(self, unpack(args));
+    end));
 
-    mt.__index = newcclosure(function(self, v)
-        if (v == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
+    local idx;
+    idx = hookmetamethod(game, "__index", newcclosure(function(self, key)
+        if (key == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
             return 0;
         end;
 
-        return idx(self, v);
-    end);
-    
-    setreadonly(mt, true);
+        return idx(self, key);
+    end));
 
-    local function onCharacterAdded()
+    local function onCharacterAdded(char)
+        if (not char) then return end;
         wait(1);
         local mainScript = client.Backpack:WaitForChild("Main");
-        variables = getupvalue(getsenv(mainScript).hasGauntlet, 1);
+        variables = getupvalue(getsenv(mainScript).charJump, 1);
         variables.adminLevel = 13;
         getfenv().script = mainScript;
         mainEnv = getsenv(mainScript);
@@ -72,14 +67,11 @@ do
             local antiFallField = Instance.new("ForceField");
             antiFallField.Visible = false;
             antiFallField.Name = "joe";
-            antiFallField.Parent = client.Character;
+            antiFallField.Parent = char;
         end;
     end;
 
-    if (client.Character) then
-        onCharacterAdded();
-    end;
-
+    onCharacterAdded(client.Character);
     client.CharacterAdded:Connect(onCharacterAdded);
 end;
 
