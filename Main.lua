@@ -6,6 +6,7 @@
 
 local getupvalue = (getupvalue or debug.getupvalue);
 local getmetatable = (debug.getmetatable or getrawmetatable);
+local hookmetamethod = hookmetamethod or function(tbl, mt, func) return hookfunction(getrawmetatable(tbl)[mt], func) end;
 
 repeat wait() until game:IsLoaded();
 
@@ -28,7 +29,22 @@ do
         "HighCombo";
         "r";
         "t";
+        "FF";
     };
+
+    if (typeof(syn) == "table" and syn.run_secure_lua) then
+        -- Jfc fix getfenv you cunt
+        local fenv;
+        fenv = hookfunction(getfenv, newcclosure(function(level)
+            if (level == 2) then
+                return {
+                    script = client.Backpack:FindFirstChild("Main");
+                };
+            end;
+    
+            return fenv(level);
+        end));
+    end;
 
     local nc;
     nc = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
@@ -36,7 +52,7 @@ do
         local method = getnamecallmethod();
     
         if (method == "FireServer" and table.find(banRemotes, self.Name)) then
-            return;
+            return wait(10e16);
         elseif (method == "FireServer" and self.Name == "SubmitCombo" and args[1] > 299) then
             args[1] = math.random(250, 299); --> Hudzell, please suck my cock :)
         end;
@@ -92,9 +108,6 @@ parkour:AddToggle({
     flag = "auto_farm";
     callback = function(enabled)
         if (not enabled) then return end;
-        if (typeof(syn) == "table" and syn.run_secure_lua) then
-            return client:Kick("\nSynapse fucked getfenv or something, idfc.");
-        end;
 
         while library.flags.auto_farm do
             if (client.Backpack and client.Backpack:FindFirstChild("Main") and client.PlayerScripts:FindFirstChild("Points") and getsenv(client.Backpack.Main)) then
