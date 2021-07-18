@@ -13,6 +13,7 @@ repeat wait() until game:IsLoaded();
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/LegoHacks/Utilities/main/UI.lua"))();
 local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local scriptContext = game:GetService("ScriptContext");
 local client = players.LocalPlayer;
 local variables, mainEnv, encrypt;
 
@@ -36,7 +37,8 @@ do
         -- Jfc fix getfenv you cunt
         local fenv;
         fenv = hookfunction(getfenv, newcclosure(function(level)
-            if (level == 2) then
+            local traceback = debug.traceback();
+            if (checkcaller() and level == 2 and traceback:find("Main") or traceback:find("Encoding")) then
                 return {
                     script = client.Backpack:FindFirstChild("Main");
                 };
@@ -52,9 +54,11 @@ do
         local method = getnamecallmethod();
     
         if (method == "FireServer" and table.find(banRemotes, self.Name)) then
-            return wait(10e16);
+            return;
         elseif (method == "FireServer" and self.Name == "SubmitCombo" and args[1] > 299) then
             args[1] = math.random(250, 299); --> Hudzell, please suck my cock :)
+        elseif (method == "TakeDamage" and self.ClassName == "Humanoid" and library.flags.god_mode) then
+            return;
         end;
     
         return nc(self, unpack(args));
@@ -62,7 +66,7 @@ do
 
     local idx;
     idx = hookmetamethod(game, "__index", newcclosure(function(self, key)
-        if (key == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
+        if (key == "PlaybackLoudness" and (not syn and getfenv(2).script.Name == "RadioScript" or debug.traceback():find("RadioScript")) and library.flags.audio_bypass) then
             return 0;
         end;
 
@@ -74,17 +78,12 @@ do
         wait(1);
         local mainScript = client.Backpack:WaitForChild("Main");
         variables = getupvalue(getsenv(mainScript).charJump, 1);
-        variables.adminLevel = 13;
-        getfenv().script = mainScript;
+        variables.adminLevel = 6;
+        if (not syn) then
+            getfenv().script = mainScript;
+        end;
         mainEnv = getsenv(mainScript);
         encrypt = mainEnv.encrypt;
-
-        if (library.flags.god_mode) then
-            local antiFallField = Instance.new("ForceField");
-            antiFallField.Visible = false;
-            antiFallField.Name = "joe";
-            antiFallField.Parent = char;
-        end;
     end;
 
     onCharacterAdded(client.Character);
@@ -137,18 +136,6 @@ parkour:AddToggle({
 parkour:AddToggle({
     text = "No Fall Damage";
     flag = "god_mode";
-    callback = function(enabled)
-        if (enabled) then
-            if (client.Character and not client.Character:FindFirstChild("joe")) then --> I know who joe is.
-                local antiFallField = Instance.new("ForceField");
-                antiFallField.Visible = false;
-                antiFallField.Name = "joe";
-                antiFallField.Parent = client.Character;
-            end;
-        elseif (client.Character and client.Character:FindFirstChild("joe")) then
-            client.Character.joe:Destroy();
-        end;
-    end;
 });
 
 parkour:AddToggle({
