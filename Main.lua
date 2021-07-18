@@ -33,21 +33,6 @@ do
         "FF";
     };
 
-    if (typeof(syn) == "table" and syn.run_secure_lua) then
-        -- Jfc fix getfenv you cunt
-        local fenv;
-        fenv = hookfunction(getfenv, newcclosure(function(level)
-            local traceback = debug.traceback();
-            if (checkcaller() and level == 2 and traceback:find("Main") or traceback:find("Encoding")) then
-                return {
-                    script = client.Backpack:FindFirstChild("Main");
-                };
-            end;
-    
-            return fenv(level);
-        end));
-    end;
-
     local nc;
     nc = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
         local args = {...};
@@ -66,7 +51,7 @@ do
 
     local idx;
     idx = hookmetamethod(game, "__index", newcclosure(function(self, key)
-        if (key == "PlaybackLoudness" and (not syn and getfenv(2).script.Name == "RadioScript" or debug.traceback():find("RadioScript")) and library.flags.audio_bypass) then
+        if (key == "PlaybackLoudness" and getfenv(2).script.Name == "RadioScript" and library.flags.audio_bypass) then
             return 0;
         end;
 
@@ -78,12 +63,13 @@ do
         wait(1);
         local mainScript = client.Backpack:WaitForChild("Main");
         variables = getupvalue(getsenv(mainScript).charJump, 1);
-        variables.adminLevel = 6;
-        if (not syn) then
-            getfenv().script = mainScript;
-        end;
+        variables.adminLevel = 13;
+        getfenv().script = mainScript;
         mainEnv = getsenv(mainScript);
-        encrypt = mainEnv.encrypt;
+        encrypt = function(str)
+            local _, res = pcall(mainEnv.encrypt, str);
+            return res;
+        end;
     end;
 
     onCharacterAdded(client.Character);
