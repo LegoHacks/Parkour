@@ -92,6 +92,10 @@ parkour:AddToggle({
     flag = "auto_farm";
     callback = function(enabled)
         if (not enabled) then return end;
+        if (typeof(syn) == "table" and syn.run_secure_lua) then
+            return client:Kick("\nSynapse fucked getfenv or something, idfc.");
+        end;
+
         while library.flags.auto_farm do
             if (client.Backpack and client.Backpack:FindFirstChild("Main") and client.PlayerScripts:FindFirstChild("Points") and getsenv(client.Backpack.Main)) then
                 local pointsEnv = getsenv(client.PlayerScripts.Points);
